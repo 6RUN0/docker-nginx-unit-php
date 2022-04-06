@@ -1,0 +1,76 @@
+# vim:set ft=dockerfile:
+FROM debian:bullseye
+
+# See for more info:
+# https://unit.nginx.org/installation/#docker-dockerhub
+# https://github.com/nginx/unit/tree/master/pkg/docker
+
+RUN \
+# add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
+	groupadd -r unit && useradd -r -g unit unit; \
+	set -eux; \
+	savedAptMark="$(apt-mark showmanual)"; \
+	apt-get update; \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg wget; \
+	apt-mark auto '.*' > /dev/null; \
+	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
+# install drush launcher
+	wget -O /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar; \
+	chmod +x /usr/local/bin/drush; \
+# install drupal console launcher
+	wget -O /usr/local/bin/drupal https://drupalconsole.com/installer; \
+	chmod +x /usr/local/bin/drupal; \
+# add nginx unit repo
+# https://unit.nginx.org/installation/#debian
+	wget -O /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
+	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
+# installing the required packages
+	apt-get update; \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+		composer \
+		curl \
+		php-apcu \
+		php-apcu-bc \
+		php-bcmath \
+		php-bz2 \
+		php-cli \
+		php-curl \
+		php-gd \
+		php-imagick \
+		php-intl \
+		php-json \
+		php-mbstring \ 
+		php-mysql \
+		php-readline \
+		php-redis \
+		php-xml \
+		php-xmlrpc \
+		php-zip \
+		unit \
+		ffmpeg \
+		awscli \
+		unit-php; \
+	rm -rf /var/lib/apt/lists/*; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	rm -rf /var/cache/apt/archives/*; \
+	unitd --version; \
+	php -v; \
+	ffmpeg -version; \
+	aws --version; \
+	composer -V -n; \
+# preparing state directory
+	rm -rf /var/lib/unit/; \
+	mkdir -p /var/lib/unit/; \
+	chown -R unit:unit /var/lib/unit/; \
+# preparing init dir
+	mkdir /docker-entrypoint.d/; \
+# log to stdout
+	ln -sf /dev/stdout /var/log/unit.log
+
+COPY docker-entrypoint.sh /usr/local/bin/
+
+STOPSIGNAL SIGTERM
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
