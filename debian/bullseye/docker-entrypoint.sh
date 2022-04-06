@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-set -e
+set -ex
+
+APPLICATION_USER=${APPLICATION_USER:="unit"}
+APPLICATION_GROUP=${APPLICATION_GROUP:="unit"}
 
 curl_put()
 {
@@ -17,6 +20,23 @@ curl_put()
     fi
     return 0
 }
+
+if [ -z $(getent group "$APPLICATION_GROUP") ]; then
+    echo "Create app group: '$APPLICATION_GROUP'"
+    groupadd "$APPLICATION_GROUP"
+fi
+
+if ! id "$APPLICATION_USER" &>/dev/null; then
+    echo "Create app user: '$APPLICATION_USER'"
+    useradd -M -s /usr/sbin/nologin -g "$APPLICATION_GROUP" "$APPLICATION_USER"
+fi
+
+if [ ! -z "$APPLICATION_DIR" ]; then
+    echo "Create app dir: '$APPLICATION_DIR'"
+    mkdir -p "$APPLICATION_DIR"
+    chown -R "$APPLICATION_USER":"$APPLICATION_GROUP" "$APPLICATION_DIR"
+    usermod --move-home --home "$APPLICATION_DIR"
+fi
 
 if [ "$1" = "unitd" -o "$1" = "unitd-debug" ]; then
     if find "/var/lib/unit/" -mindepth 1 -print -quit 2>/dev/null | grep -q .; then
