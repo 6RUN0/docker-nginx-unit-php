@@ -35,7 +35,7 @@ if [ ! -z "$APPLICATION_DIR" ]; then
     echo "Create app dir: '$APPLICATION_DIR'"
     mkdir -p "$APPLICATION_DIR"
     chown -R "$APPLICATION_USER":"$APPLICATION_GROUP" "$APPLICATION_DIR"
-    usermod --move-home --home "$APPLICATION_DIR"
+    usermod --home "$APPLICATION_DIR"
 fi
 
 if [ "$1" = "unitd" -o "$1" = "unitd-debug" ]; then
