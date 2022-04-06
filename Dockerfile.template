@@ -18,7 +18,7 @@ RUN \
 	wget -O /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar; \
 	chmod +x /usr/local/bin/drush; \
 # install drupal console launcher
-	wget -O /usr/local/bin/drupal https://drupalconsole.com/installer; \
+	wget -O /usr/local/bin/drupal https://github.com/hechoendrupal/drupal-console-launcher/releases/latest/download/drupal.phar; \
 	chmod +x /usr/local/bin/drupal; \
 # add nginx unit repo
 # https://unit.nginx.org/installation/#%%DISTR%%
