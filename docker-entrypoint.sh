@@ -34,7 +34,7 @@ fi
 if [ ! -z "$APPLICATION_DIR" ]; then
     echo "Create app dir: '$APPLICATION_DIR'"
     mkdir -p "$APPLICATION_DIR"
-    chown -R "$APPLICATION_USER":"$APPLICATION_GROUP" "$APPLICATION_DIR"
+    find "$APPLICATION_DIR" \! -user "$APPLICATION_USER" -exec chown "$APPLICATION_USER":"$APPLICATION_GROUP" '{}' +
     usermod --home "$APPLICATION_DIR" "$APPLICATION_USER"
 fi
 
