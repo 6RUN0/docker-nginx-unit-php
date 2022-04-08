@@ -39,7 +39,7 @@ if [ ! -z "$APPLICATION_DIR" ]; then
 fi
 
 if [ "$1" = "unitd" -o "$1" = "unitd-debug" ]; then
-    if find "/var/lib/unit/" -mindepth 1 -print -quit 2>/dev/null | grep -q .; then
+    if find "/var/lib/unit/" -type f -print -quit 2>/dev/null | grep -q .; then
         echo "$0: /var/lib/unit/ is not empty, skipping initial configuration..."
     else
         if find "/docker-entrypoint.d/" -mindepth 1 -print -quit 2>/dev/null | grep -q .; then

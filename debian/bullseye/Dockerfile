@@ -59,18 +59,18 @@ RUN \
 	aws --version; \
 	composer -V -n; \
 # preparing state directory
-	rm -rf /var/lib/unit/; \
-	mkdir -p /var/lib/unit/; \
-	chown -R unit:unit /var/lib/unit/; \
+	rm -rf /var/lib/unit; \
+	mkdir -p /var/lib/unit; \
+	chown -R unit:unit /var/lib/unit; \
 # preparing init dir
-	mkdir /docker-entrypoint.d/; \
+	mkdir /docker-entrypoint.d; \
 # log to stdout
 	ln -sf /dev/stdout /var/log/unit.log
 
-COPY docker-entrypoint.sh /usr/local/bin/
+COPY docker-entrypoint.sh /
 
 STOPSIGNAL SIGTERM
 
-ENTRYPOINT ["docker-entrypoint.sh"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 
 CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
