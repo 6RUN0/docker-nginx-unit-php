@@ -1,5 +1,5 @@
 # vim:set ft=dockerfile:
-FROM %%DISTR%%:%%SUITE%%
+FROM %%DISTR%%:%%SUITE%%-slim
 
 # See for more info:
 # https://unit.nginx.org/installation/#docker-dockerhub

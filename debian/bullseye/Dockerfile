@@ -1,5 +1,5 @@
 # vim:set ft=dockerfile:
-FROM debian:bullseye
+FROM debian:bullseye-slim
 
 # See for more info:
 # https://unit.nginx.org/installation/#docker-dockerhub
