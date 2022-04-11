@@ -67,6 +67,7 @@ RUN \
 # log to stdout
 	ln -sf /dev/stdout /var/log/unit.log
 
+COPY docker-entrypoint-common.sh /
 COPY docker-entrypoint.sh /
 
 STOPSIGNAL SIGTERM

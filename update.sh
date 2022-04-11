@@ -17,7 +17,8 @@ for distr in "${distrs[@]}"; do
 	suites=( $distr/* )
 	suites=( "${suites##*/}" )
 	for suite in "$suites"; do
-		cp "docker-entrypoint.sh"  "$distr/$suite/docker-entrypoint.sh"
+		cp *.sh  "$distr/$suite/"
+		rm -f "$distr/$suite/update.sh" 
 		sed -r \
 			-e 's/%%DISTR%%/'"$distr"'/' \
 			-e 's/%%SUITE%%/'"$suite"'/' \
