@@ -27,8 +27,11 @@ RUN \
 # installing the required packages
 	apt-get update; \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+		awscli \
 		composer \
 		curl \
+		ffmpeg \
+		msmtp \
 		php-apcu \
 		php-apcu-bc \
 		php-bcmath \
@@ -47,8 +50,6 @@ RUN \
 		php-xmlrpc \
 		php-zip \
 		unit \
-		ffmpeg \
-		awscli \
 		unit-php; \
 	rm -rf /var/lib/apt/lists/*; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
@@ -58,10 +59,13 @@ RUN \
 	ffmpeg -version; \
 	aws --version; \
 	composer -V -n; \
+	msmtp --version; \
 # preparing state directory
 	rm -rf /var/lib/unit; \
 	mkdir -p /var/lib/unit; \
 	chown -R unit:unit /var/lib/unit; \
+# use msmtp as sendmail
+	ln -sf /usr/bin/msmtp /usr/sbin/sendmail; \
 # preparing init dir
 	mkdir /docker-entrypoint.d; \
 # log to stdout

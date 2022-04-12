@@ -31,10 +31,12 @@ if ! id "$APPLICATION_USER" &>/dev/null; then
 fi
 
 if [ ! -z "$APPLICATION_DIR" ]; then
-    ngx_info "create app dir: '$APPLICATION_DIR'"
-    mkdir -p "$APPLICATION_DIR"
+    if [ ! -d "$APPLICATION_DIR" ]; then
+        ngx_info "create app dir: '$APPLICATION_DIR'"
+        mkdir -p "$APPLICATION_DIR"
+        usermod --home "$APPLICATION_DIR" "$APPLICATION_USER" &>/dev/null
+    fi
     find "$APPLICATION_DIR" \! -user "$APPLICATION_USER" -exec chown "$APPLICATION_USER":"$APPLICATION_GROUP" '{}' +
-    usermod --home "$APPLICATION_DIR" "$APPLICATION_USER"
 fi
 
 if [ "$1" = "unitd" -o "$1" = "unitd-debug" ]; then
