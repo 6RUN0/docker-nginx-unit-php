@@ -5,7 +5,9 @@ set -e
 . /docker-entrypoint-common.sh
 
 APPLICATION_USER=${APPLICATION_USER:="unit"}
+APPLICATION_UID=${APPLICATION_UID:="1000"}
 APPLICATION_GROUP=${APPLICATION_GROUP:="unit"}
+APPLICATION_GID=${APPLICATION_GID:="1000"}
 
 curl_put()
 {
@@ -22,12 +24,12 @@ curl_put()
 
 if [ -z $(getent group "$APPLICATION_GROUP") ]; then
     ngx_info "create app group: '$APPLICATION_GROUP'"
-    groupadd "$APPLICATION_GROUP"
+    groupadd "$APPLICATION_GROUP" -g "$APPLICATION_GID"
 fi
 
 if ! id "$APPLICATION_USER" &>/dev/null; then
     ngx_info "create app user: '$APPLICATION_USER'"
-    useradd -M -s /bin/bash -g "$APPLICATION_GROUP" "$APPLICATION_USER"
+    useradd -M -s /bin/bash -g "$APPLICATION_GROUP" -u "$APPLICATION_UID" "$APPLICATION_USER"
 fi
 
 if [ ! -z "$APPLICATION_DIR" ]; then
