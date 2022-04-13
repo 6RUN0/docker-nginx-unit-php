@@ -34,8 +34,8 @@ if [ ! -z "$APPLICATION_DIR" ]; then
     if [ ! -d "$APPLICATION_DIR" ]; then
         ngx_info "create app dir: '$APPLICATION_DIR'"
         mkdir -p "$APPLICATION_DIR"
-        usermod --home "$APPLICATION_DIR" "$APPLICATION_USER" &>/dev/null
     fi
+    usermod --home "$APPLICATION_DIR" "$APPLICATION_USER" &>/dev/null
     find "$APPLICATION_DIR" \! -user "$APPLICATION_USER" -exec chown "$APPLICATION_USER":"$APPLICATION_GROUP" '{}' +
 fi
 
