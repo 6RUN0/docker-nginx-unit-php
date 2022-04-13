@@ -27,7 +27,7 @@ fi
 
 if ! id "$APPLICATION_USER" &>/dev/null; then
     ngx_info "create app user: '$APPLICATION_USER'"
-    useradd -M -s /usr/sbin/nologin -g "$APPLICATION_GROUP" "$APPLICATION_USER"
+    useradd -M -s /bin/bash -g "$APPLICATION_GROUP" "$APPLICATION_USER"
 fi
 
 if [ ! -z "$APPLICATION_DIR" ]; then
