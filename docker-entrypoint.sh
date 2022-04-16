@@ -27,7 +27,7 @@ if [ -z $(getent group "$APPLICATION_GROUP") ]; then
     groupadd "$APPLICATION_GROUP" -g "$APPLICATION_GID"
 fi
 
-if ! id "$APPLICATION_USER" &>/dev/null; then
+if [ -z $(getent passwd "$APPLICATION_USER") ]; then
     ngx_info "create app user: '$APPLICATION_USER'"
     useradd -M -s /bin/bash -g "$APPLICATION_GROUP" -u "$APPLICATION_UID" "$APPLICATION_USER"
 fi
