@@ -14,6 +14,18 @@ RUN \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg wget; \
 	apt-mark auto '.*' > /dev/null; \
 	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
+# install gosu
+	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
+	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/latest/download/gosu-$dpkgArch"; \
+	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/latest/download/gosu-$dpkgArch.asc"; \
+	export GNUPGHOME="$(mktemp -d)"; \
+	gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
+	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
+	gpgconf --kill all; \
+	rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc; \
+	chmod +x /usr/local/bin/gosu; \
+	gosu --version; \
+	gosu nobody true; \
 # install drush launcher
 	wget -O /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar; \
 	chmod +x /usr/local/bin/drush; \
@@ -31,6 +43,7 @@ RUN \
 		composer \
 		curl \
 		ffmpeg \
+		git \
 		msmtp \
 		php-apcu \
 		php-apcu-bc \
@@ -49,6 +62,7 @@ RUN \
 		php-xml \
 		php-xmlrpc \
 		php-zip \
+		scour \
 		unit \
 		unit-php; \
 	rm -rf /var/lib/apt/lists/*; \
