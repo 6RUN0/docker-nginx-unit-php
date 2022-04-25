@@ -45,6 +45,7 @@ RUN \
 		ffmpeg \
 		git \
 		msmtp \
+		openssh-client \
 		php-apcu \
 		php-apcu-bc \
 		php-bcmath \
@@ -64,7 +65,8 @@ RUN \
 		php-zip \
 		scour \
 		unit \
-		unit-php; \
+		unit-php \
+		unzip; \
 	rm -rf /var/lib/apt/lists/*; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/cache/apt/archives/*; \
