@@ -1,5 +1,5 @@
 # vim:set ft=dockerfile:
-FROM %%DISTR%%:%%SUITE%%-slim
+FROM debian:bullseye-slim
 
 # See for more info:
 # https://unit.nginx.org/installation/#docker-dockerhub
@@ -33,17 +33,17 @@ RUN \
 	wget -O /usr/local/bin/drupal https://github.com/hechoendrupal/drupal-console-launcher/releases/latest/download/drupal.phar; \
 	chmod +x /usr/local/bin/drupal; \
 # add nginx unit repo
-# https://unit.nginx.org/installation/#%%DISTR%%
+# https://unit.nginx.org/installation/#debian
 	wget -O /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
-	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/%%DISTR%%/ %%SUITE%% unit" > /etc/apt/sources.list.d/unit.list; \
-# hold package version %%VERSION%%~%%SUITE%%
+	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
+# hold package version 1.26.0-1~bullseye
 	echo > /etc/apt/preferences.d/unit; \
 	echo "Package: unit" >> /etc/apt/preferences.d/unit; \
-	echo "Pin: version %%VERSION%%~%%SUITE%%" >> /etc/apt/preferences.d/unit; \
+	echo "Pin: version 1.26.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
 	echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
 	echo >> /etc/apt/preferences.d/unit; \
 	echo "Package: unit-php" >> /etc/apt/preferences.d/unit; \
-	echo "Pin: version %%VERSION%%~%%SUITE%%" >> /etc/apt/preferences.d/unit; \
+	echo "Pin: version 1.26.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
 	echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
 # installing the required packages
 	apt-get update; \
