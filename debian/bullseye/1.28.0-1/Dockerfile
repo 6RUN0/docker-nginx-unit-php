@@ -36,14 +36,14 @@ RUN \
 # https://unit.nginx.org/installation/#debian
 	wget -O /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
 	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
-# hold package version 1.25.0-1~bullseye
+# hold package version 1.28.0-1~bullseye
 	echo > /etc/apt/preferences.d/unit; \
 	echo "Package: unit" >> /etc/apt/preferences.d/unit; \
-	echo "Pin: version 1.25.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
+	echo "Pin: version 1.28.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
 	echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
 	echo >> /etc/apt/preferences.d/unit; \
 	echo "Package: unit-php" >> /etc/apt/preferences.d/unit; \
-	echo "Pin: version 1.25.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
+	echo "Pin: version 1.28.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
 	echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
 # installing the required packages
 	apt-get update; \

@@ -49,6 +49,7 @@ RUN \
 	apt-get update; \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 		awscli \
+		bind9-host \
 		composer \
 		curl \
 		ffmpeg \
@@ -75,7 +76,8 @@ RUN \
 		scour \
 		unit \
 		unit-php \
-		unzip; \
+		unzip \
+                ; \
 	rm -rf /var/lib/apt/lists/*; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	rm -rf /var/cache/apt/archives/*; \
