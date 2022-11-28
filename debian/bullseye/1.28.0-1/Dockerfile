@@ -66,7 +66,7 @@ RUN \
 		php-imagick \
 		php-intl \
 		php-json \
-		php-mbstring \ 
+		php-mbstring \
 		php-mysql \
 		php-readline \
 		php-redis \
