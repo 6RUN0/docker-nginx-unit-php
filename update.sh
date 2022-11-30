@@ -28,12 +28,16 @@ for distr in "${distrs[@]}"; do
 			cp *.sh  "$distr/$suite/$ver/"
 			rm -f "$distr/$suite/$ver/update.sh" 
 			dockerfile="$distr/$suite/$ver/Dockerfile"
+			template="Dockerfile.$distr.$suite.template"
+			if [ ! -r "$template" ]; then
+				template="Dockerfile.template"
+			fi
 			sed -r \
 				-e 's/%%DISTR%%/'"$distr"'/' \
 				-e 's/%%SUITE%%/'"$suite"'/' \
 				-e 's/%%VERSION%%/'"$ver"'/' \
 				-e 's/%%IMAGE_SUFFIX%%/'"$image_suffix"'/' \
-				"Dockerfile.template" > "$dockerfile"
+				"$template" > "$dockerfile"
 			if [ "$suites" = "jammy" ]; then
 				sed -i -e '/php-apcu-bc/d' "$dockerfile"
 			fi
