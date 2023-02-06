@@ -10,14 +10,22 @@ RUN \
 	curl -o /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
 	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
 # https://deb.sury.org
-	echo "138.199.37.225 packages.sury.org" >> /etc/hosts; \
 	curl -o /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
 	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
 	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
+# hold package version 1.27.0-1~bullseye
+        echo > /etc/apt/preferences.d/unit; \
+        echo "Package: unit" >> /etc/apt/preferences.d/unit; \
+        echo "Pin: version 1.27.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
+        echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
+        echo >> /etc/apt/preferences.d/unit; \
+        echo "Package: unit-php" >> /etc/apt/preferences.d/unit; \
+        echo "Pin: version 1.27.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
+        echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
 	apt-get update; \
-	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends unit php-cli php-dev libphp-embed build-essential fakeroot devscripts; \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends unit php8.1-cli php8.1-dev libphp8.1-embed build-essential fakeroot devscripts; \
 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
 	phpVer="$(php --version | sed -n -E -e 's/^PHP ([0-9]\.[0-9]).*$/\1/p')"; \
 	unitVer="$(unitd --version 2>&1 | sed -n -E -e 's/unit version: ([0-9.]+)/\1/p')"; \
@@ -41,7 +49,7 @@ RUN \
 	echo "Maintainer: boris_t <boris.t.66@gmail.com>" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Description: Custom PHP $phpVer language module for NGINX Unit $unitVer" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	dpkg-deb -b "$buildDir/unit-php$phpVer"; \
-	curl --upload-file "$buildDir/unit-php$phpVer.deb" "https://transfer.sh/unit-php$phpVer.dev";
+	curl --upload-file "$buildDir/unit-php$phpVer.deb" "https://transfer.sh/unit-php$phpVer.deb";
 
 
 FROM debian:bullseye-slim
@@ -80,7 +88,7 @@ RUN \
 	wget -O /usr/local/bin/composer "https://github.com/composer/composer/releases/latest/download/composer.phar"; \
 	wget -O /usr/local/bin/composer.asc "https://github.com/composer/composer/releases/latest/download/composer.phar.asc"; \
 	export GNUPGHOME="$(mktemp -d)"; \
-	gpg --batch --keyserver pgp.mit.edu --recv-keys 161DFBE342889F01DDAC4E61CBB3D576F2A0946F; \
+	gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys 161DFBE342889F01DDAC4E61CBB3D576F2A0946F; \
 	gpg --batch --verify /usr/local/bin/composer.asc /usr/local/bin/composer; \
 	gpgconf --kill all; \
 	rm -rf "$GNUPGHOME" /usr/local/bin/composer.asc; \
@@ -103,7 +111,6 @@ RUN \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/unit; \
 	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
 # https://deb.sury.org
-	echo "138.199.37.225 packages.sury.org" >> /etc/hosts; \
 	wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
 	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
 	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
@@ -117,25 +124,24 @@ RUN \
 		curl \
 		ffmpeg \
 		git \
-		libphp-embed \
+		libphp8.1-embed \
 		msmtp \
 		openssh-client \
-		php-apcu \
-		php-bcmath \
-		php-bz2 \
-		php-cli \
-		php-curl \
-		php-gd \
-		php-imagick \
-		php-intl \
-		php-json \
-		php-mbstring \
-		php-mysql \
-		php-readline \
-		php-redis \
-		php-xml \
-		php-xmlrpc \
-		php-zip \
+		php8.1-apcu \
+		php8.1-bcmath \
+		php8.1-bz2 \
+		php8.1-cli \
+		php8.1-curl \
+		php8.1-gd \
+		php8.1-imagick \
+		php8.1-intl \
+		php8.1-mbstring \
+		php8.1-mysql \
+		php8.1-readline \
+		php8.1-redis \
+		php8.1-xml \
+		php8.1-xmlrpc \
+		php8.1-zip \
 		scour \
 		unit \
 		unzip \
