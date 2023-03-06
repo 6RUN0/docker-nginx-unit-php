@@ -15,14 +15,14 @@ RUN \
 	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
-# hold package version 1.25.0-1~bullseye
+# hold package version 1.29.1-1~bullseye
         echo > /etc/apt/preferences.d/unit; \
         echo "Package: unit" >> /etc/apt/preferences.d/unit; \
-        echo "Pin: version 1.25.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
+        echo "Pin: version 1.29.1-1~bullseye" >> /etc/apt/preferences.d/unit; \
         echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
         echo >> /etc/apt/preferences.d/unit; \
         echo "Package: unit-php" >> /etc/apt/preferences.d/unit; \
-        echo "Pin: version 1.25.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
+        echo "Pin: version 1.29.1-1~bullseye" >> /etc/apt/preferences.d/unit; \
         echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
 	apt-get update; \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends unit php8.1-cli php8.1-dev libphp8.1-embed build-essential fakeroot devscripts; \
@@ -45,7 +45,7 @@ RUN \
 	echo "Package: unit-php$phpVer" > "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Version: $unitVer" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Architecture: $dpkgArch" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
-	echo "Depends: unit (= 1.25.0-1~bullseye), libphp-embed" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
+	echo "Depends: unit (= 1.29.1-1~bullseye), libphp-embed" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Maintainer: boris_t <boris.t.66@gmail.com>" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Description: Custom PHP $phpVer language module for NGINX Unit $unitVer" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	dpkg-deb -b "$buildDir/unit-php$phpVer";
@@ -99,14 +99,14 @@ RUN \
 # https://unit.nginx.org/installation/#debian
 	wget -O /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
 	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
-# hold package version 1.25.0-1~bullseye
+# hold package version 1.29.1-1~bullseye
 	echo > /etc/apt/preferences.d/unit; \
 	echo "Package: unit" >> /etc/apt/preferences.d/unit; \
-	echo "Pin: version 1.25.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
+	echo "Pin: version 1.29.1-1~bullseye" >> /etc/apt/preferences.d/unit; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/unit; \
 	echo >> /etc/apt/preferences.d/unit; \
 	echo "Package: unit-php" >> /etc/apt/preferences.d/unit; \
-	echo "Pin: version 1.25.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
+	echo "Pin: version 1.29.1-1~bullseye" >> /etc/apt/preferences.d/unit; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/unit; \
 	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
 # https://deb.sury.org

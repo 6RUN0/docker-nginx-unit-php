@@ -29,7 +29,7 @@ RUN \
 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
 	phpVer="$(php --version | sed -n -E -e 's/^PHP ([0-9]\.[0-9]).*$/\1/p')"; \
 	unitVer="$(unitd --version 2>&1 | sed -n -E -e 's/unit version: ([0-9.]+)/\1/p')"; \
-	unitConfigure="$(unitd --version 2>&1 | sed -n -E -e 's/^configured as (.+?)--ld-opt=.*/\1/p')"; \
+	unitConfigure="$(unitd --version 2>&1 | sed -n -E -e 's/--njs //g' -e 's/^configured as (.+?)--ld-opt=.*/\1/p')"; \
 	unitModuleDir="$(unitd --version 2>&1 | sed -n -E -e 's/^.*--modules=(\S+).*$/\1/p')"; \
 	buildDir="/usr/src/unit"; \
 	mkdir -p "$buildDir/unit-php$phpVer/DEBIAN"; \
@@ -48,8 +48,7 @@ RUN \
 	echo "Depends: unit (= 1.26.1-1~bullseye), libphp-embed" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Maintainer: boris_t <boris.t.66@gmail.com>" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Description: Custom PHP $phpVer language module for NGINX Unit $unitVer" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
-	dpkg-deb -b "$buildDir/unit-php$phpVer"; \
-	curl --upload-file "$buildDir/unit-php$phpVer.deb" "https://transfer.sh/unit-php$phpVer.deb";
+	dpkg-deb -b "$buildDir/unit-php$phpVer";
 
 
 FROM debian:bullseye-slim
