@@ -46,8 +46,12 @@ RUN \
 	sh -c "$unitConfigure"; \
 	./configure php --module=php$phpVer --config=php-config; \
 	make php$phpVer; \
-	mkdir -p "$buildDir/unit-php$phpVer$unitModuleDir"; \
-	for l in `find build/ -name php$phpVer.unit.so`; do mv $l "$buildDir/unit-php$phpVer$unitModuleDir"; done; \
+	[ -f "build/lib/unit/modules/php$phpVer.unit.so" ] && \
+	mkdir -p $buildDir/unit-php$phpVer$unitModuleDir/usr && \
+	mv build/lib $buildDir/unit-php$phpVer$unitModuleDir/usr/lib; \
+	[ -f "build/php$phpVer.unit.so" ] && \
+	mkdir -p "$buildDir/unit-php$phpVer$unitModuleDir" && \
+	mv build/php$phpVer.unit.so "$buildDir/unit-php$phpVer$unitModuleDir"; \
 	echo "Package: unit-php$phpVer" > "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Version: $unitVer" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Architecture: $dpkgArch" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
