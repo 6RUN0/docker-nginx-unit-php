@@ -10,8 +10,14 @@ RUN \
 	curl -o /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
 	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/%%DISTR%%/ %%SUITE%% unit" > /etc/apt/sources.list.d/unit.list; \
 # https://deb.sury.org
-	curl -o /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
-	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ %%SUITE%% main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
+#	curl -o /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
+#	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ %%SUITE%% main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
+#	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
+#	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
+#	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
+# https://debian.octopuce.fr/sury-php/ mirror of deb.sury.org
+	curl -o /usr/share/keyrings/org.sury.packages.php.gpg https://debian.octopuce.fr/sury-php/apt.gpg; \
+	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] http://debian.octopuce.fr/sury-php/ %%SUITE%% main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
 	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
@@ -41,7 +47,7 @@ RUN \
 	./configure php --module=php$phpVer --config=php-config; \
 	make php$phpVer; \
 	mkdir -p "$buildDir/unit-php$phpVer$unitModuleDir"; \
-	mv build/php$phpVer.unit.so "$buildDir/unit-php$phpVer$unitModuleDir"; \
+	for l in `find build/ -name php$phpVer.unit.so`; do mv $l "$buildDir/unit-php$phpVer$unitModuleDir"; done; \
 	echo "Package: unit-php$phpVer" > "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Version: $unitVer" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Architecture: $dpkgArch" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
@@ -52,6 +58,8 @@ RUN \
 
 
 FROM %%DISTR%%:%%SUITE%%%%IMAGE_SUFFIX%%
+
+ENV GOSU_VERSION 1.16
 
 # See for more info:
 # https://unit.nginx.org/installation/#docker-dockerhub
@@ -65,19 +73,21 @@ RUN \
 	set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
-	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg wget; \
+	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg wget apt-transport-https; \
 	apt-mark auto '.*' > /dev/null; \
 	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
 # install gosu
 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
-	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/latest/download/gosu-$dpkgArch"; \
-	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/latest/download/gosu-$dpkgArch.asc"; \
+	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
+	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
+# verify the signature
 	export GNUPGHOME="$(mktemp -d)"; \
 	gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
 	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
 	gpgconf --kill all; \
 	rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc; \
 	chmod +x /usr/local/bin/gosu; \
+# verify that the binary works
 	gosu --version; \
 	gosu nobody true; \
 # install drush launcher
@@ -110,8 +120,14 @@ RUN \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/unit; \
 	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/%%DISTR%%/ %%SUITE%% unit" > /etc/apt/sources.list.d/unit.list; \
 # https://deb.sury.org
-	wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
-	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ %%SUITE%% main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
+#	curl -o /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
+#	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ %%SUITE%% main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
+#	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
+#	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
+#	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
+# https://debian.octopuce.fr/sury-php/ mirror of deb.sury.org
+	wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://debian.octopuce.fr/sury-php/apt.gpg; \
+	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] http://debian.octopuce.fr/sury-php/ %%SUITE%% main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
 	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
