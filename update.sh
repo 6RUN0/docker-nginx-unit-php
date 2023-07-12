@@ -7,7 +7,7 @@ cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
 distrs=( "$@" )
 
 if [ ${#distrs[@]} -eq 0 ]; then
-	GLOBIGNORE=".*:tests"
+	GLOBIGNORE=".*:latest/"
 	distrs=( */ )
 fi
 
@@ -24,11 +24,15 @@ for distr in "${distrs[@]}"; do
 			image_suffix=""
 		fi
 		for ver in $versions; do
-			mkdir -p "$distr/$suite/$ver/"
-			cp *.sh  "$distr/$suite/$ver/"
-			rm -f "$distr/$suite/$ver/update.sh" 
-			dockerfile="$distr/$suite/$ver/Dockerfile"
+			dst_dir="$distr/$suite/$suite-$ver/"
+			mkdir -p "$dst_dir"
+			cp *.sh  "$dst_dir"
+			rm -f "${dst_dir}update.sh" 
+			dockerfile="${dst_dir}Dockerfile"
 			template="Dockerfile.$distr.$suite.template"
+			if [ ! -r "$template" ]; then
+				template="Dockerfile.$distr.template"
+			fi
 			if [ ! -r "$template" ]; then
 				template="Dockerfile.template"
 			fi
