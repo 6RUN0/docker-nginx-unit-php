@@ -49,6 +49,7 @@ RUN \
 	apt-get update; \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 		awscli \
+		ca-certificates \
 		composer \
 		cron \
 		curl \
