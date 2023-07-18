@@ -14,9 +14,8 @@ fi
 distrs=( "${distrs[@]%/}" )
 
 for distr in "${distrs[@]}"; do
-	suites=( $distr/* )
-	suites=( "${suites##*/}" )
-	for suite in "$suites"; do
+	for suite in $distr/*; do
+		suite=${suite##*/}
 		versions=$(wget -O - https://packages.nginx.org/unit/$distr/pool/unit/u/unit/ | sed -n -E -e "s/<a.+?>unit_(.+?)~${suite}_amd64.deb<\/a>.*/\1/p" | sort -u)
 		if [ "$distr" = "debian" ]; then
 			image_suffix="-slim"
@@ -42,7 +41,7 @@ for distr in "${distrs[@]}"; do
 				-e 's/%%VERSION%%/'"$ver"'/' \
 				-e 's/%%IMAGE_SUFFIX%%/'"$image_suffix"'/' \
 				"$template" > "$dockerfile"
-			if [ "$suites" = "jammy" ]; then
+			if [ "$suite" = "jammy" ]; then
 				sed -i -e '/php-apcu-bc/d' "$dockerfile"
 			fi
 		done
