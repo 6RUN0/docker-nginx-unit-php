@@ -8,6 +8,7 @@ APPLICATION_USER=${APPLICATION_USER:="unit"}
 APPLICATION_UID=${APPLICATION_UID:="1000"}
 APPLICATION_GROUP=${APPLICATION_GROUP:="unit"}
 APPLICATION_GID=${APPLICATION_GID:="1000"}
+APPLICATION_CHOWN=${APPLICATION_CHOWN:="yes"}
 
 curl_put()
 {
@@ -38,7 +39,9 @@ if [ ! -z "$APPLICATION_DIR" ]; then
         mkdir -p "$APPLICATION_DIR"
     fi
     usermod --home "$APPLICATION_DIR" "$APPLICATION_USER" &>/dev/null
-    find "$APPLICATION_DIR" \! -user "$APPLICATION_USER" -exec chown "$APPLICATION_USER":"$APPLICATION_GROUP" '{}' +
+    if [ "x$APPLICATION_CHOWN" = "xyes" ]; then
+        find "$APPLICATION_DIR" \! -user "$APPLICATION_USER" -exec chown "$APPLICATION_USER":"$APPLICATION_GROUP" '{}' +
+    fi
 fi
 
 if [ "$1" = "unitd" -o "$1" = "unitd-debug" ]; then
