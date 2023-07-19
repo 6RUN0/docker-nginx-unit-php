@@ -54,6 +54,12 @@ if [ "$1" = "unitd" -o "$1" = "unitd-debug" ]; then
             # this curl call will get a reply once unit is fully launched
             curl -s -X GET --unix-socket /var/run/control.unit.sock http://localhost/
 
+            ngx_info "looking for shell scripts in /docker-entrypoint.d/..."
+            for f in $(find /docker-entrypoint.d/ -type f -name "*.sh"); do
+                ngx_info "launching $f";
+                "$f"
+            done
+
             ngx_info "looking for certificate bundles in /docker-entrypoint.d/..."
             for f in $(find /docker-entrypoint.d/ -type f -name "*.pem"); do
                 ngx_info "uploading certificates bundle: $f"
@@ -64,12 +70,6 @@ if [ "$1" = "unitd" -o "$1" = "unitd-debug" ]; then
             for f in $(find /docker-entrypoint.d/ -type f -name "*.json"); do
                 ngx_info "applying configuration $f";
                 curl_put $f "config"
-            done
-
-            ngx_info "looking for shell scripts in /docker-entrypoint.d/..."
-            for f in $(find /docker-entrypoint.d/ -type f -name "*.sh"); do
-                ngx_info "launching $f";
-                "$f"
             done
 
             # warn on filetypes we don't know what to do with
