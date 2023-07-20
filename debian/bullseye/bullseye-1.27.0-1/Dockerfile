@@ -1,22 +1,24 @@
 # vim:set ft=dockerfile:
 # https://unit.nginx.org/howto/modules/
 FROM debian:bullseye-slim as builder
+
+ARG DEBIAN_FRONTEND noninteractive
+
 RUN \
-# add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 	set -eux; \
 	apt-get update; \
-	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg curl apt-transport-https; \
+	apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg wget apt-transport-https; \
 # https://unit.nginx.org/installation/#debian
-	curl -o /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
+	wget -O /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
 	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
 # https://deb.sury.org
-#	curl -o /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
+#	wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
 #	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
 #	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 #	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
 #	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
 # https://debian.octopuce.fr/sury-php/ mirror of deb.sury.org
-	curl -o /usr/share/keyrings/org.sury.packages.php.gpg https://debian.octopuce.fr/sury-php/apt.gpg; \
+	wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://debian.octopuce.fr/sury-php/apt.gpg; \
 	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] http://debian.octopuce.fr/sury-php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
 	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
@@ -31,7 +33,7 @@ RUN \
         echo "Pin: version 1.27.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
         echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
 	apt-get update; \
-	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends unit php8.1-cli php8.1-dev libphp8.1-embed build-essential fakeroot devscripts; \
+	apt-get install -y --no-install-recommends unit php8.1-cli php8.1-dev libphp8.1-embed build-essential fakeroot devscripts; \
 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
 	phpVer="$(php --version | sed -n -E -e 's/^PHP ([0-9]\.[0-9]).*$/\1/p')"; \
 	unitVer="$(unitd --version 2>&1 | sed -n -E -e 's/unit version: ([0-9.]+)/\1/p')"; \
@@ -40,7 +42,7 @@ RUN \
 	buildDir="/usr/src/unit"; \
 	mkdir -p "$buildDir/unit-php$phpVer/DEBIAN"; \
 	cd "$buildDir"; \
-	curl -o unit-$unitVer.tar.gz "https://unit.nginx.org/download/unit-$unitVer.tar.gz"; \
+	wget -O unit-$unitVer.tar.gz "https://unit.nginx.org/download/unit-$unitVer.tar.gz"; \
 	tar xzf "unit-$unitVer.tar.gz"; \
 	cd "unit-$unitVer"; \
 	sh -c "$unitConfigure"; \
@@ -61,54 +63,25 @@ RUN \
 	dpkg-deb -b "$buildDir/unit-php$phpVer";
 
 
-FROM debian:bullseye-slim
-
-ENV GOSU_VERSION 1.16
-
 # See for more info:
 # https://unit.nginx.org/installation/#docker-dockerhub
 # https://github.com/nginx/unit/tree/master/pkg/docker
+FROM debian:bullseye-slim
+
+ARG DEBIAN_FRONTEND noninteractive
 
 COPY --from=builder /usr/src/unit/*.deb /tmp
 
 RUN \
-# add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
-	groupadd -r unit && useradd -r -g unit unit; \
 	set -eux; \
+# add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
+	groupadd -r unit; \
+	useradd -r -g unit unit; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg wget apt-transport-https; \
 	apt-mark auto '.*' > /dev/null; \
 	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
-# install gosu
-	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
-	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
-	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
-# verify the signature
-	export GNUPGHOME="$(mktemp -d)"; \
-	gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
-	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
-	gpgconf --kill all; \
-	rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc; \
-	chmod +x /usr/local/bin/gosu; \
-# verify that the binary works
-	gosu --version; \
-	gosu nobody true; \
-# install drush launcher
-	wget -O /usr/local/bin/drush https://github.com/drush-ops/drush-launcher/releases/latest/download/drush.phar; \
-	chmod +x /usr/local/bin/drush; \
-# install composer
-	wget -O /usr/local/bin/composer "https://github.com/composer/composer/releases/latest/download/composer.phar"; \
-	wget -O /usr/local/bin/composer.asc "https://github.com/composer/composer/releases/latest/download/composer.phar.asc"; \
-	export GNUPGHOME="$(mktemp -d)"; \
-	gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys 161DFBE342889F01DDAC4E61CBB3D576F2A0946F; \
-	gpg --batch --verify /usr/local/bin/composer.asc /usr/local/bin/composer; \
-	gpgconf --kill all; \
-	rm -rf "$GNUPGHOME" /usr/local/bin/composer.asc; \
-	chmod +x /usr/local/bin/composer; \
-# install drupal console launcher
-	wget -O /usr/local/bin/drupal https://github.com/hechoendrupal/drupal-console-launcher/releases/latest/download/drupal.phar; \
-	chmod +x /usr/local/bin/drupal; \
 # add nginx unit repo
 # https://unit.nginx.org/installation/#debian
 	wget -O /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
@@ -124,7 +97,7 @@ RUN \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/unit; \
 	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
 # https://deb.sury.org
-#	curl -o /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
+#	wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
 #	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
 #	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 #	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
@@ -139,12 +112,7 @@ RUN \
 	apt-get update; \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
 		ca-certificates \
-		cron \
-		curl \
-		git \
 		libphp8.1-embed \
-		msmtp \
-		openssh-client \
 		php8.1-apcu \
 		php8.1-bcmath \
 		php8.1-bz2 \
@@ -161,25 +129,19 @@ RUN \
 		php8.1-xmlrpc \
 		php8.1-zip \
 		unit \
-		unzip \
-                ; \
+		; \
 	dpkg -i /tmp/*.deb; \
 	rm -rf /tmp/*.deb; \
-	rm -rf /var/lib/apt/lists/*; \
 	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	apt autoclean -y; \
+	rm -rf /var/lib/apt/lists/*; \
 	rm -rf /var/cache/apt/archives/*; \
 	unitd --version; \
 	php -v; \
-	ffmpeg -version; \
-	aws --version; \
-	composer -V -n; \
-	msmtp --version; \
 # preparing state directory
 	rm -rf /var/lib/unit; \
 	mkdir -p /var/lib/unit; \
 	chown -R unit:unit /var/lib/unit; \
-# use msmtp as sendmail
-	ln -sf /usr/bin/msmtp /usr/sbin/sendmail; \
 # preparing init dir
 	mkdir /docker-entrypoint.d; \
 # log to stdout
