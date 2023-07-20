@@ -138,11 +138,9 @@ RUN \
 # installing the required packages
 	apt-get update; \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-		awscli \
 		ca-certificates \
 		cron \
 		curl \
-		ffmpeg \
 		git \
 		libphp8.1-embed \
 		msmtp \
@@ -162,7 +160,6 @@ RUN \
 		php8.1-xml \
 		php8.1-xmlrpc \
 		php8.1-zip \
-		scour \
 		unit \
 		unzip \
                 ; \

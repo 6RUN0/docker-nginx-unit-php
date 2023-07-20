@@ -48,12 +48,10 @@ RUN \
 # installing the required packages
 	apt-get update; \
 	DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-		awscli \
 		ca-certificates \
 		composer \
 		cron \
 		curl \
-		ffmpeg \
 		git \
 		msmtp \
 		openssh-client \
@@ -73,7 +71,6 @@ RUN \
 		php-xml \
 		php-xmlrpc \
 		php-zip \
-		scour \
 		unit \
 		unit-php \
 		unzip \
