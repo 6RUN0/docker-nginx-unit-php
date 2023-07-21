@@ -1,7 +1,7 @@
 # vim:set ft=dockerfile:
 FROM ubuntu:jammy
 
-ARG DEBIAN_FRONTEND noninteractive
+ARG DEBIAN_FRONTEND=noninteractive
 
 # See for more info:
 # https://unit.nginx.org/installation/#docker-dockerhub
@@ -13,8 +13,8 @@ RUN \
 	useradd -r -g unit unit; \
 	set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg wget; \
+	apt update; \
+	apt install -y --no-install-recommends ca-certificates dirmngr gnupg wget; \
 	apt-mark auto '.*' > /dev/null; \
 	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
 # add nginx unit repo
@@ -31,8 +31,8 @@ RUN \
 	echo "Pin: version 1.30.0-1~jammy" >> /etc/apt/preferences.d/unit; \
 	echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
 # installing the required packages
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
+	apt update; \
+	apt install -y --no-install-recommends \
 		ca-certificates \
 		php-apcu \
 		php-bcmath \
@@ -53,7 +53,7 @@ RUN \
 		unit \
 		unit-php \
 		; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
 	apt autoclean -y; \
 	rm -rf /var/lib/apt/lists/*; \
 	rm -rf /var/cache/apt/archives/*; \
