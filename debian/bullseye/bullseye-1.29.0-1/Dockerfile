@@ -128,6 +128,7 @@ RUN \
 		php8.1-xml \
 		php8.1-xmlrpc \
 		php8.1-zip \
+		tini \
 		unit \
 		; \
 	dpkg -i /tmp/*.deb; \
@@ -149,8 +150,6 @@ RUN \
 
 COPY docker-entrypoint*.sh /
 
-STOPSIGNAL SIGTERM
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 
 CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]

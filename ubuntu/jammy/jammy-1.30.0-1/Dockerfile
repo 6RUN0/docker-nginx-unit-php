@@ -50,6 +50,7 @@ RUN \
 		php-xml \
 		php-xmlrpc \
 		php-zip \
+		tini \
 		unit \
 		unit-php \
 		; \
@@ -70,8 +71,6 @@ RUN \
 
 COPY docker-entrypoint*.sh /
 
-STOPSIGNAL SIGTERM
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
+ENTRYPOINT ["tini", "--", "/docker-entrypoint.sh"]
 
 CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
