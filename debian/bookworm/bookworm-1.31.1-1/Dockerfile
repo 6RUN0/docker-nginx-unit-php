@@ -108,9 +108,6 @@ RUN \
 	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
-# https://relay.so/docs/1.x/installation#linux
-       wget -O - "https://repos.r2.relay.so/key.gpg" | gpg --dearmor -o "/usr/share/keyrings/repos.r2.relay.so.gpg"; \
-       echo "deb [signed-by=/usr/share/keyrings/repos.r2.relay.so.gpg] https://repos.r2.relay.so/deb bookworm main" > /etc/apt/sources.list.d/repos.r2.relay.so.list; \
 # installing the required packages
 	apt update; \
 	apt install -y --no-install-recommends \
@@ -128,7 +125,6 @@ RUN \
 		php8.1-mysql \
 		php8.1-readline \
 		php8.1-redis \
-		php8.1-relay \
 		php8.1-xml \
 		php8.1-xmlrpc \
 		php8.1-zip \
