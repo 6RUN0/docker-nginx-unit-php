@@ -33,7 +33,7 @@ RUN \
         echo "Pin: version 1.31.1-1~bookworm" >> /etc/apt/preferences.d/unit; \
         echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
 	apt update; \
-	apt install -y --no-install-recommends unit php8.1-cli php8.1-dev libphp8.1-embed build-essential fakeroot devscripts; \
+	apt install -y --no-install-recommends unit php8.2-cli php8.2-dev libphp8.2-embed build-essential fakeroot devscripts; \
 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
 	phpVer="$(php --version | sed -n -E -e 's/^PHP ([0-9]\.[0-9]).*$/\1/p')"; \
 	unitVer="$(unitd --version 2>&1 | sed -n -E -e 's/unit version: ([0-9.]+)/\1/p')"; \
@@ -112,22 +112,22 @@ RUN \
 	apt update; \
 	apt install -y --no-install-recommends \
 		ca-certificates \
-		libphp8.1-embed \
-		php8.1-apcu \
-		php8.1-bcmath \
-		php8.1-bz2 \
-		php8.1-cli \
-		php8.1-curl \
-		php8.1-gd \
-		php8.1-imagick \
-		php8.1-intl \
-		php8.1-mbstring \
-		php8.1-mysql \
-		php8.1-readline \
-		php8.1-redis \
-		php8.1-xml \
-		php8.1-xmlrpc \
-		php8.1-zip \
+		libphp8.2-embed \
+		php8.2-apcu \
+		php8.2-bcmath \
+		php8.2-bz2 \
+		php8.2-cli \
+		php8.2-curl \
+		php8.2-gd \
+		php8.2-imagick \
+		php8.2-intl \
+		php8.2-mbstring \
+		php8.2-mysql \
+		php8.2-readline \
+		php8.2-redis \
+		php8.2-xml \
+		php8.2-xmlrpc \
+		php8.2-zip \
 		tini \
 		unit \
 		; \
