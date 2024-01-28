@@ -25,7 +25,7 @@ for distr in "${distrs[@]}"; do
 		fi
 		for ver in $versions; do
 			for php_ver in $php_versions; do
-				dst_dir="$distr/$suite/$suite-$ver/$php_ver/"
+				dst_dir="${distr}/${suite}/${suite}-${ver}-php${php_ver}/"
 				mkdir -p "$dst_dir"
 				cp *.sh  "$dst_dir"
 				rm -f "${dst_dir}update.sh" 
