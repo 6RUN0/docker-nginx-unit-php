@@ -12,6 +12,7 @@ if [ ${#distrs[@]} -eq 0 ]; then
 fi
 
 distrs=( "${distrs[@]%/}" )
+php_versions="7.4 8.1 8.2"
 
 for distr in "${distrs[@]}"; do
 	for suite in $distr/*; do
@@ -23,27 +24,30 @@ for distr in "${distrs[@]}"; do
 			image_suffix=""
 		fi
 		for ver in $versions; do
-			dst_dir="$distr/$suite/$suite-$ver/"
-			mkdir -p "$dst_dir"
-			cp *.sh  "$dst_dir"
-			rm -f "${dst_dir}update.sh" 
-			dockerfile="${dst_dir}Dockerfile"
-			template="Dockerfile.$distr.$suite.template"
-			if [ ! -r "$template" ]; then
-				template="Dockerfile.$distr.template"
-			fi
-			if [ ! -r "$template" ]; then
-				template="Dockerfile.template"
-			fi
-			sed -r \
-				-e 's/%%DISTR%%/'"$distr"'/' \
-				-e 's/%%SUITE%%/'"$suite"'/' \
-				-e 's/%%VERSION%%/'"$ver"'/' \
-				-e 's/%%IMAGE_SUFFIX%%/'"$image_suffix"'/' \
-				"$template" > "$dockerfile"
-			if [ "$suite" = "jammy" ]; then
-				sed -i -e '/php-apcu-bc/d' "$dockerfile"
-			fi
+			for php_ver in $php_versions; do
+				dst_dir="$distr/$suite/$suite-$ver/$php_ver/"
+				mkdir -p "$dst_dir"
+				cp *.sh  "$dst_dir"
+				rm -f "${dst_dir}update.sh" 
+				dockerfile="${dst_dir}Dockerfile"
+				template="Dockerfile.$distr.$suite.$php_ver.template"
+				if [ ! -r "$template" ]; then
+					template="Dockerfile.$distr.$suite.template"
+				fi
+				if [ ! -r "$template" ]; then
+					template="Dockerfile.$distr.template"
+				fi
+				if [ ! -r "$template" ]; then
+					template="Dockerfile.template"
+				fi
+				sed -r \
+					-e 's/%%DISTR%%/'"$distr"'/' \
+					-e 's/%%SUITE%%/'"$suite"'/' \
+					-e 's/%%VERSION%%/'"$ver"'/' \
+					-e 's/%%IMAGE_SUFFIX%%/'"$image_suffix"'/' \
+					-e 's/%%PHP_VER%%/'"$php_ver"'/' \
+					"$template" > "$dockerfile"
+			done
 		done
 	done
 done

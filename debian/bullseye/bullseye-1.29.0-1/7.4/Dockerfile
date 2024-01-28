@@ -1,37 +1,37 @@
 # vim:set ft=dockerfile:
 # https://unit.nginx.org/howto/modules/
-FROM %%DISTR%%:%%SUITE%%%%IMAGE_SUFFIX%% as builder
+FROM debian:bullseye-slim as builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN \
 	set -eux; \
-	php_ver=%%PHP_VER%%; \
+	php_ver=7.4; \
 	apt update; \
 	apt install -y --no-install-recommends ca-certificates dirmngr gnupg wget apt-transport-https; \
-# https://unit.nginx.org/installation/#%%DISTR%%
+# https://unit.nginx.org/installation/#debian
 	wget -O /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
-	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/%%DISTR%%/ %%SUITE%% unit" > /etc/apt/sources.list.d/unit.list; \
+	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
 # https://deb.sury.org
 #	wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
-#	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ %%SUITE%% main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
+#	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
 #	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 #	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
 #	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
 # https://debian.octopuce.fr/sury-php/ mirror of deb.sury.org
 	wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://debian.octopuce.fr/sury-php/apt.gpg; \
-	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] http://debian.octopuce.fr/sury-php/ %%SUITE%% main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
+	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] http://debian.octopuce.fr/sury-php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
 	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
-# hold package version %%VERSION%%~%%SUITE%%
+# hold package version 1.29.0-1~bullseye
         echo > /etc/apt/preferences.d/unit; \
         echo "Package: unit" >> /etc/apt/preferences.d/unit; \
-        echo "Pin: version %%VERSION%%~%%SUITE%%" >> /etc/apt/preferences.d/unit; \
+        echo "Pin: version 1.29.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
         echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
         echo >> /etc/apt/preferences.d/unit; \
         echo "Package: unit-php" >> /etc/apt/preferences.d/unit; \
-        echo "Pin: version %%VERSION%%~%%SUITE%%" >> /etc/apt/preferences.d/unit; \
+        echo "Pin: version 1.29.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
         echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
 	apt update; \
 	apt install -y --no-install-recommends unit php${php_ver}-cli php${php_ver}-dev libphp${php_ver}-embed build-essential fakeroot devscripts; \
@@ -58,7 +58,7 @@ RUN \
 	echo "Package: unit-php$phpVer" > "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Version: $unitVer" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Architecture: $dpkgArch" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
-	echo "Depends: unit (= %%VERSION%%~%%SUITE%%), libphp-embed" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
+	echo "Depends: unit (= 1.29.0-1~bullseye), libphp-embed" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Maintainer: boris_t <boris.t.66@gmail.com>" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	echo "Description: Custom PHP $phpVer language module for NGINX Unit $unitVer" >> "$buildDir/unit-php$phpVer/DEBIAN/control"; \
 	dpkg-deb -b "$buildDir/unit-php$phpVer";
@@ -67,7 +67,7 @@ RUN \
 # See for more info:
 # https://unit.nginx.org/installation/#docker-dockerhub
 # https://github.com/nginx/unit/tree/master/pkg/docker
-FROM %%DISTR%%:%%SUITE%%%%IMAGE_SUFFIX%%
+FROM debian:bullseye-slim
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -75,7 +75,7 @@ COPY --from=builder /usr/src/unit/*.deb /tmp
 
 RUN \
 	set -eux; \
-	php_ver=%%PHP_VER%%; \
+	php_ver=7.4; \
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 	groupadd -r unit; \
 	useradd -r -g unit unit; \
@@ -85,28 +85,28 @@ RUN \
 	apt-mark auto '.*' > /dev/null; \
 	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
 # add nginx unit repo
-# https://unit.nginx.org/installation/#%%DISTR%%
+# https://unit.nginx.org/installation/#debian
 	wget -O /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
-	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/%%DISTR%%/ %%SUITE%% unit" > /etc/apt/sources.list.d/unit.list; \
-# hold package version %%VERSION%%~%%SUITE%%
+	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
+# hold package version 1.29.0-1~bullseye
 	echo > /etc/apt/preferences.d/unit; \
 	echo "Package: unit" >> /etc/apt/preferences.d/unit; \
-	echo "Pin: version %%VERSION%%~%%SUITE%%" >> /etc/apt/preferences.d/unit; \
+	echo "Pin: version 1.29.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/unit; \
 	echo >> /etc/apt/preferences.d/unit; \
 	echo "Package: unit-php" >> /etc/apt/preferences.d/unit; \
-	echo "Pin: version %%VERSION%%~%%SUITE%%" >> /etc/apt/preferences.d/unit; \
+	echo "Pin: version 1.29.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/unit; \
-	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/%%DISTR%%/ %%SUITE%% unit" > /etc/apt/sources.list.d/unit.list; \
+	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
 # https://deb.sury.org
 #	wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
-#	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ %%SUITE%% main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
+#	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
 #	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 #	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
 #	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
 # https://debian.octopuce.fr/sury-php/ mirror of deb.sury.org
 	wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://debian.octopuce.fr/sury-php/apt.gpg; \
-	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] http://debian.octopuce.fr/sury-php/ %%SUITE%% main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
+	echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] http://debian.octopuce.fr/sury-php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
 	echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
