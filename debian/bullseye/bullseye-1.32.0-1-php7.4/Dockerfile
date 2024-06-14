@@ -7,8 +7,8 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN \
 	set -eux; \
 	php_ver=7.4; \
-	apt update; \
-	apt install -y --no-install-recommends ca-certificates dirmngr gnupg wget apt-transport-https; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg wget apt-transport-https; \
 # https://unit.nginx.org/installation/#debian
 	wget -O /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
 	echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
@@ -33,8 +33,8 @@ RUN \
         echo "Package: unit-php" >> /etc/apt/preferences.d/unit; \
         echo "Pin: version 1.32.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
         echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
-	apt update; \
-	apt install -y --no-install-recommends unit php${php_ver}-cli php${php_ver}-dev libphp${php_ver}-embed build-essential fakeroot devscripts; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends unit php${php_ver}-cli php${php_ver}-dev libphp${php_ver}-embed build-essential fakeroot devscripts; \
 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
 	phpVer="$(php --version | sed -n -E -e 's/^PHP ([0-9]\.[0-9]).*$/\1/p')"; \
 	unitVer="$(unitd --version 2>&1 | sed -n -E -e 's/unit version: ([0-9.]+)/\1/p')"; \
@@ -80,8 +80,8 @@ RUN \
 	groupadd -r unit; \
 	useradd -r -g unit unit; \
 	savedAptMark="$(apt-mark showmanual)"; \
-	apt update; \
-	apt install -y --no-install-recommends ca-certificates dirmngr gnupg wget apt-transport-https; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg wget apt-transport-https; \
 	apt-mark auto '.*' > /dev/null; \
 	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; \
 # add nginx unit repo
@@ -111,8 +111,8 @@ RUN \
 	echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
 	echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
 # installing the required packages
-	apt update; \
-	apt install -y --no-install-recommends \
+	apt-get update; \
+	apt-get install -y --no-install-recommends \
 		ca-certificates \
 		libphp${php_ver}-embed \
 		php${php_ver}-mysql \
@@ -134,13 +134,13 @@ RUN \
 		unit \
 		; \
 	[ "$php_ver" == "7.4" ] && \
-	apt install -y --no-install-recommends \
+	apt-get install -y --no-install-recommends \
 		php${php_ver}-apcu-bc \
 		; \
 	dpkg -i /tmp/*.deb; \
 	rm -rf /tmp/*.deb; \
-	apt purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	apt autoclean -y; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	apt-get autoclean -y; \
 	rm -rf /var/lib/apt/lists/*; \
 	rm -rf /var/cache/apt/archives/*; \
 	unitd --version; \
