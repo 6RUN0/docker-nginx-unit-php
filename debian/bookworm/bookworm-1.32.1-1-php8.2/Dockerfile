@@ -34,7 +34,7 @@ RUN \
         echo "Pin: version 1.32.1-1~bookworm" >> /etc/apt/preferences.d/unit; \
         echo "Pin-Priority: 1002" >> /etc/apt/preferences.d/unit; \
 	apt-get update; \
-	apt-get install -y --no-install-recommends unit php${php_ver}-cli php${php_ver}-dev libphp${php_ver}-embed build-essential fakeroot devscripts; \
+	apt-get install -y --no-install-recommends unit php${php_ver}-cli php${php_ver}-dev libphp${php_ver}-embed build-essential fakeroot devscripts curl; \
 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
 	phpVer="$(php --version | sed -n -E -e 's/^PHP ([0-9]\.[0-9]).*$/\1/p')"; \
 	unitVer="$(unitd --version 2>&1 | sed -n -E -e 's/unit version: ([0-9.]+)/\1/p')"; \
