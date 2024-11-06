@@ -7,31 +7,32 @@ else
 fi
 
 ngx_log() {
-	local type="$1"; shift
-	printf '%s [%s] %s#%s [entrypoint] #0: %s\n' "$(date +'%Y/%m/%d %H:%M:%S')" "$type" "$$" "$$" "$*" >&3
+    local type="$1"
+    shift
+    printf '%s [%s] %s#%s [entrypoint] #0: %s\n' "$(date +'%Y/%m/%d %H:%M:%S')" "$type" "$$" "$$" "$*" >&3
 }
 
 ngx_err() {
-	ngx_log err "$@"
-	exit 1
+    ngx_log err "$@"
+    exit 1
 }
 
 ngx_warning() {
-	ngx_log warning "$@"
+    ngx_log warning "$@"
 }
 
 ngx_notice() {
-	ngx_log notice "$@"
+    ngx_log notice "$@"
 }
 
 ngx_info() {
-	ngx_log info "$@"
+    ngx_log info "$@"
 }
 
 curl_put() {
-    RET=`curl -s -w '%{http_code}' -X PUT --data-binary @$1 --unix-socket /var/run/control.unit.sock http://localhost/$2`
+    RET=$(curl -s -w '%{http_code}' -X PUT --data-binary "@$1" --unix-socket "/var/run/control.unit.sock http://localhost/$2")
     RET_BODY=${RET::-3}
-    RET_STATUS=$(echo $RET | tail -c 4)
+    RET_STATUS=$(echo "$RET" | tail -c 4)
     if [ "$RET_STATUS" -ne "200" ]; then
         ngx_error "HTTP response status code is '$RET_STATUS'. Body: $RET_BODY"
     else
@@ -56,7 +57,7 @@ if [ -z $(getent passwd "$APPLICATION_USER") ]; then
     useradd -M -s /bin/bash -g "$APPLICATION_GROUP" -u "$APPLICATION_UID" "$APPLICATION_USER"
 fi
 
-if [ ! -z "$APPLICATION_DIR" ]; then
+if [ -n "$APPLICATION_DIR" ]; then
     if [ ! -d "$APPLICATION_DIR" ]; then
         ngx_info "create app dir: '$APPLICATION_DIR'"
         mkdir -p "$APPLICATION_DIR"
