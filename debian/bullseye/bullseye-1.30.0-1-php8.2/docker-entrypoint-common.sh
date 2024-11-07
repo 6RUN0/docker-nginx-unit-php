@@ -17,8 +17,16 @@ ngx_err() {
     exit 1
 }
 
-ngx_warning() {
+ngx_error() {
+    ngx_err "$@"
+}
+
+ngx_warn() {
     ngx_log warning "$@"
+}
+
+ngx_warning() {
+    ngx_warn "$@"
 }
 
 ngx_notice() {
@@ -30,11 +38,11 @@ ngx_info() {
 }
 
 curl_put() {
-    RET=$(curl -s -w '%{http_code}' -X PUT --data-binary "@$1" --unix-socket "/var/run/control.unit.sock http://localhost/$2")
+    RET=$(curl -s -w '%{http_code}' -X PUT --data-binary "@$1" --unix-socket /var/run/control.unit.sock "http://localhost/$2")
     RET_BODY=${RET::-3}
     RET_STATUS=$(echo "$RET" | tail -c 4)
     if [ "$RET_STATUS" -ne "200" ]; then
-        ngx_error "HTTP response status code is '$RET_STATUS'. Body: $RET_BODY"
+        ngx_err "HTTP response status code is '$RET_STATUS'. Body: $RET_BODY"
     else
         ngx_info "HTTP response status code is '$RET_STATUS'. Body: $RET_BODY"
     fi

@@ -135,28 +135,43 @@ RUN \
     apt-get install -y --no-install-recommends \
     ca-certificates \
     libphp${php_ver}-embed \
-    php${php_ver}-apcu \
     php${php_ver}-bcmath \
     php${php_ver}-bz2 \
     php${php_ver}-cli \
     php${php_ver}-curl \
     php${php_ver}-gd \
-    php${php_ver}-imagick \
     php${php_ver}-intl \
     php${php_ver}-mbstring \
     php${php_ver}-mysql \
     php${php_ver}-readline \
-    php${php_ver}-redis \
     php${php_ver}-xml \
-    php${php_ver}-xmlrpc \
     php${php_ver}-zip \
     tini \
     unit \
     curl \
     ; \
+    [ "$php_ver" != "8.4" ] && \
+    apt-get install -y --no-install-recommends \
+    php${php_ver}-apcu \
+    php${php_ver}-imagick \
+    php${php_ver}-redis \
+    php${php_ver}-uploadprogress \
+    php${php_ver}-xmlrpc \
+    php${php_ver}-yaml \
+    ; \
+    [ "$php_ver" != "5.6" ] && \
+    [ "$php_ver" != "8.4" ] && \
+    apt-get install -y --no-install-recommends \
+    php${php_ver}-psr \
+    ; \
     [ "$php_ver" == "7.4" ] && \
     apt-get install -y --no-install-recommends \
     php${php_ver}-apcu-bc \
+    php${php_ver}-json \
+    ; \
+    [ "$php_ver" == "5.6" ] && \
+    apt-get install -y --no-install-recommends \
+    php${php_ver}-json \
     ; \
     dpkg -i /tmp/*.deb; \
     rm -rf /tmp/*.deb; \
