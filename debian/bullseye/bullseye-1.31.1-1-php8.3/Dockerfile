@@ -159,11 +159,6 @@ RUN \
     php${php_ver}-xmlrpc \
     php${php_ver}-yaml \
     ; \
-    [ "$php_ver" != "5.6" ] && \
-    [ "$php_ver" != "8.4" ] && \
-    apt-get install -y --no-install-recommends \
-    php${php_ver}-psr \
-    ; \
     [ "$php_ver" == "7.4" ] && \
     apt-get install -y --no-install-recommends \
     php${php_ver}-apcu-bc \
