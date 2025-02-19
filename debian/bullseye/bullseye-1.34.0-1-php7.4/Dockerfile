@@ -1,4 +1,3 @@
-# vim:set ft=dockerfile:
 # https://unit.nginx.org/howto/modules/
 FROM debian:bullseye-slim AS builder
 
@@ -42,11 +41,13 @@ RUN \
     apt-get update; \
     apt-get install -y --no-install-recommends \
     build-essential \
+    cargo \
     devscripts \
     fakeroot \
     libphp${php_ver}-embed \
     php${php_ver}-cli \
     php${php_ver}-dev \
+    rustc \
     unit \
     ; \
     dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
