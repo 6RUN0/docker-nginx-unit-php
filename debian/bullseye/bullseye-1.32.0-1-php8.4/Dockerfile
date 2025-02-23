@@ -2,10 +2,25 @@
 FROM debian:bullseye-slim AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_MIRROR="http://mirror.yandex.ru/debian"
+ARG DEBIAN_SECURITY_MIRROR="http://mirror.yandex.ru/debian-security"
+# Mirror of packages.sury.org
+#  - https://packages.sury.org/php/
+#  - http://debian.octopuce.fr/sury-php/
+ARG SURY_MIRROR="http://mirror.yandex.ru/mirrors/packages.sury.org/php/"
 
 RUN \
     set -eux; \
     php_ver=8.4; \
+    apt_mirror() { \
+    sed -i \
+    -e "s|http://deb.debian.org/debian|$2|g" \
+    -e "s|http://deb.debian.org/debian-security|$3|g" $1; \
+    }; \
+    [ -w "/etc/apt/sources.list.d/debian.sources" ] && \
+    apt_mirror "/etc/apt/sources.list.d/debian.sources" "${DEBIAN_MIRROR}" "${DEBIAN_SECURITY_MIRROR}"; \
+    [ -w "/etc/apt/sources.list" ] && \
+    apt_mirror "/etc/apt/sources.list" "${DEBIAN_MIRROR}" "${DEBIAN_SECURITY_MIRROR}"; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
     apt-transport-https \
@@ -17,15 +32,8 @@ RUN \
     # https://unit.nginx.org/installation/#debian
     wget -O /usr/share/keyrings/nginx-keyring.gpg https://unit.nginx.org/keys/nginx-keyring.gpg; \
     echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
-    # https://deb.sury.org
-    #  wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
-    #  echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
-    #  echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
-    #  echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
-    #  echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
-    # https://debian.octopuce.fr/sury-php/ mirror of deb.sury.org
-    wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://debian.octopuce.fr/sury-php/apt.gpg; \
-    echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] http://debian.octopuce.fr/sury-php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
+    wget -O /usr/share/keyrings/org.sury.packages.php.gpg ${SURY_MIRROR}apt.gpg; \
+    echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] ${SURY_MIRROR} bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
     echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
     echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
@@ -85,6 +93,12 @@ RUN \
 FROM debian:bullseye-slim
 
 ARG DEBIAN_FRONTEND=noninteractive
+ARG DEBIAN_MIRROR="http://mirror.yandex.ru/debian"
+ARG DEBIAN_SECURITY_MIRROR="http://mirror.yandex.ru/debian-security"
+# Mirror of packages.sury.org
+#  - https://packages.sury.org/php/
+#  - http://debian.octopuce.fr/sury-php/
+ARG SURY_MIRROR="http://mirror.yandex.ru/mirrors/packages.sury.org/php/"
 
 COPY --from=builder /usr/src/unit/*.deb /tmp
 
@@ -95,6 +109,15 @@ RUN \
     groupadd -r unit; \
     useradd -r -g unit unit; \
     savedAptMark="$(apt-mark showmanual)"; \
+    apt_mirror() { \
+    sed -i \
+    -e "s|http://deb.debian.org/debian|$2|g" \
+    -e "s|http://deb.debian.org/debian-security|$3|g" $1; \
+    }; \
+    [ -w "/etc/apt/sources.list.d/debian.sources" ] && \
+    apt_mirror "/etc/apt/sources.list.d/debian.sources" "${DEBIAN_MIRROR}" "${DEBIAN_SECURITY_MIRROR}"; \
+    [ -w "/etc/apt/sources.list" ] && \
+    apt_mirror "/etc/apt/sources.list" "${DEBIAN_MIRROR}" "${DEBIAN_SECURITY_MIRROR}"; \
     apt-get update; \
     apt-get install -y --no-install-recommends \
     ca-certificates \
@@ -119,15 +142,8 @@ RUN \
     echo "Pin: version 1.32.0-1~bullseye" >> /etc/apt/preferences.d/unit; \
     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/unit; \
     echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/debian/ bullseye unit" > /etc/apt/sources.list.d/unit.list; \
-    # https://deb.sury.org
-    #  wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://packages.sury.org/php/apt.gpg; \
-    #  echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] https://packages.sury.org/php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
-    #  echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
-    #  echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
-    #  echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
-    # https://debian.octopuce.fr/sury-php/ mirror of deb.sury.org
-    wget -O /usr/share/keyrings/org.sury.packages.php.gpg https://debian.octopuce.fr/sury-php/apt.gpg; \
-    echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] http://debian.octopuce.fr/sury-php/ bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
+    wget -O /usr/share/keyrings/org.sury.packages.php.gpg ${SURY_MIRROR}apt.gpg; \
+    echo "deb [signed-by=/usr/share/keyrings/org.sury.packages.php.gpg] ${SURY_MIRROR} bullseye main" > /etc/apt/sources.list.d/org.sury.packages.php.list; \
     echo "Package: *" > /etc/apt/preferences.d/org-sury-packages-php; \
     echo "Pin: release o=deb.sury.org" >> /etc/apt/preferences.d/org-sury-packages-php; \
     echo "Pin-Priority: 1001" >> /etc/apt/preferences.d/org-sury-packages-php; \
