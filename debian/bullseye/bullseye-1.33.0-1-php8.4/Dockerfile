@@ -2,8 +2,8 @@
 FROM debian:bullseye-slim AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG DEBIAN_MIRROR="http://mirror.yandex.ru/debian"
-ARG DEBIAN_SECURITY_MIRROR="http://mirror.yandex.ru/debian-security"
+ARG DEBIAN_MIRROR="http://mirror.truenetwork.ru/debian"
+ARG DEBIAN_SECURITY_MIRROR="http://mirror.truenetwork.ru/debian-security"
 # Mirror of packages.sury.org
 #  - https://packages.sury.org/php/
 #  - http://debian.octopuce.fr/sury-php/
@@ -93,8 +93,8 @@ RUN \
 FROM debian:bullseye-slim
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG DEBIAN_MIRROR="http://mirror.yandex.ru/debian"
-ARG DEBIAN_SECURITY_MIRROR="http://mirror.yandex.ru/debian-security"
+ARG DEBIAN_MIRROR="http://mirror.truenetwork.ru/debian"
+ARG DEBIAN_SECURITY_MIRROR="http://mirror.truenetwork.ru/debian-security"
 # Mirror of packages.sury.org
 #  - https://packages.sury.org/php/
 #  - http://debian.octopuce.fr/sury-php/
