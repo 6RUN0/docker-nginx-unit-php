@@ -17,7 +17,7 @@ php_versions="5.6 7.4 8.1 8.2 8.3 8.4"
 for distr in "${distrs[@]}"; do
     for suite in "$distr"/*; do
         suite=${suite##*/}
-        versions=$(wget -O - "https://packages.nginx.org/unit/$distr/pool/unit/u/unit/" | sed -n -E -e "s/<a.+?>unit_(.+?)~${suite}_amd64.deb<\/a>.*/\1/p" | sort -u | grep -v "1\.2[2-8]")
+        versions=$(wget -O - "https://packages.nginx.org/unit/$distr/pool/unit/u/unit/" | sed -n -E -e "s/<a.+?>unit_(.+?)~${suite}_amd64.deb<\/a>.*/\1/p" | sort -u | grep -v "1\.3[0-2]")
         if [ "$distr" = "debian" ]; then
             image_suffix="-slim"
         else
