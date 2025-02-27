@@ -13,8 +13,9 @@ RUN \
     set -eux; \
     apt_mirror() { \
     sed -i \
+    -e "s|http://deb.debian.org/debian-security|$3|g" \
     -e "s|http://deb.debian.org/debian|$2|g" \
-    -e "s|http://deb.debian.org/debian-security|$3|g" $1; \
+    $1; \
     }; \
     [ -w "/etc/apt/sources.list.d/debian.sources" ] && \
     apt_mirror "/etc/apt/sources.list.d/debian.sources" "${DEBIAN_MIRROR}" "${DEBIAN_SECURITY_MIRROR}"; \
