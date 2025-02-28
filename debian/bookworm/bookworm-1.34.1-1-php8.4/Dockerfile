@@ -3,8 +3,8 @@
 # Base image with package updates and package mirror change
 FROM debian:bookworm-slim AS base_image
 ARG DEBIAN_FRONTEND=noninteractive
-ARG DEBIAN_MIRROR="http://mirror.truenetwork.ru/debian"
-ARG DEBIAN_SECURITY_MIRROR="http://mirror.truenetwork.ru/debian-security"
+ARG DEBIAN_MIRROR="http://mirror.selectel.ru/debian"
+ARG DEBIAN_SECURITY_MIRROR="http://mirror.selectel.ru/debian-security"
 # Mirror of packages.sury.org
 #  - https://packages.sury.org/php/
 #  - http://debian.octopuce.fr/sury-php/
@@ -13,8 +13,8 @@ RUN \
     set -eux; \
     apt_mirror() { \
     sed -i \
-    -e "s|http://deb.debian.org/debian-security|$3|g" \
-    -e "s|http://deb.debian.org/debian|$2|g" \
+    -e "s|http://deb\.debian\.org/debian-security|$3|g" \
+    -e "s|http://deb\.debian\.org/debian|$2|g" \
     $1; \
     }; \
     [ -w "/etc/apt/sources.list.d/debian.sources" ] && \
