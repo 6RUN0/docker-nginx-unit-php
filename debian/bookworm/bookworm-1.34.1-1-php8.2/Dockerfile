@@ -8,7 +8,8 @@ ARG DEBIAN_SECURITY_MIRROR="http://mirror.selectel.ru/debian-security"
 # Mirror of packages.sury.org
 #  - https://packages.sury.org/php/
 #  - http://debian.octopuce.fr/sury-php/
-ARG SURY_MIRROR="http://mirror.yandex.ru/mirrors/packages.sury.org/php/"
+#  - https://mirrors.sunsite.dk/deb.sury.org/php/
+ARG SURY_MIRROR="http://mirrors.sunsite.dk/deb.sury.org/php/"
 RUN \
     set -eux; \
     apt_mirror() { \
@@ -22,7 +23,7 @@ RUN \
     [ -w "/etc/apt/sources.list" ] && \
     apt_mirror "/etc/apt/sources.list" "${DEBIAN_MIRROR}" "${DEBIAN_SECURITY_MIRROR}"; \
     apt-get update; \
-    apt-get upgrade -y; \
+    apt-get full-upgrade -y; \
     apt-get install -y --no-install-recommends \
     apt-transport-https \
     ca-certificates \
